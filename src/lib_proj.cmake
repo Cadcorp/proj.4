@@ -402,7 +402,7 @@ if(USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
 endif()
 
 target_include_directories(${PROJ_CORE_TARGET} PRIVATE ${SQLITE3_INCLUDE_DIR})
-target_link_libraries(${PROJ_CORE_TARGET} ${SQLITE3_LIBRARY})
+target_link_libraries(${PROJ_CORE_TARGET} PRIVATE ${SQLITE3_LIBRARY})
 
 if(TIFF_ENABLED)
   target_compile_definitions(${PROJ_CORE_TARGET} PRIVATE -DTIFF_ENABLED)
@@ -413,7 +413,14 @@ endif()
 if(CURL_ENABLED)
   target_compile_definitions(${PROJ_CORE_TARGET} PRIVATE -DCURL_ENABLED)
   target_include_directories(${PROJ_CORE_TARGET} PRIVATE ${CURL_INCLUDE_DIR})
-  target_link_libraries(${PROJ_CORE_TARGET} ${CURL_LIBRARY})
+  target_link_libraries(${PROJ_CORE_TARGET}
+    PUBLIC
+      ${CURL_LIBRARY}
+      $<$<CXX_COMPILER_ID:MSVC>:ws2_32>
+      $<$<CXX_COMPILER_ID:MSVC>:wldap32>
+      $<$<CXX_COMPILER_ID:MSVC>:advapi32>
+      $<$<CXX_COMPILER_ID:MSVC>:crypt32>
+      $<$<CXX_COMPILER_ID:MSVC>:normaliz>)
 endif()
 
 if(MSVC AND BUILD_SHARED_LIBS)
